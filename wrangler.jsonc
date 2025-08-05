@@ -1,8 +1,0 @@
-{
-  "name": "scar-search",
-  "main": "public/index.html",
-  "route": "example.com/scar-search/*",
-  "assets": {
-    "directory": "dist"
-  }
-}
