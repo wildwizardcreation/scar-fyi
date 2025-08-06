@@ -6,8 +6,8 @@ source for wildwizardcreation.com/scar.fyi | a searchable database of all of Goo
 ```
 Total Videos:
 Unqiue Terms: 
-GoodTimesWithScar Videos:
-GoodVodsWithScar Videos:
+Main Channel Videos:
+VOD Channel Videos:
 Date Range:
 ```
 <!-- END_STATS -->
