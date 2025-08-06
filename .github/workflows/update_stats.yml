@@ -1,0 +1,52 @@
+name: Update Stats
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.modified, 'manifest.json')"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          # We need to fetch the whole history to be able to push back
+          fetch-depth: 0
+
+      - name: Extract stats from manifest.json
+        id: stats
+        run: |
+          echo "uniqueTermCount=$(jq .stats.uniqueTermCount manifest.json)" >> $GITHUB_OUTPUT
+          echo "subtitleCount=$(jq .stats.subtitleCount manifest.json)" >> $GITHUB_OUTPUT
+          echo "videoCount=$(jq .stats.videoCount manifest.json)" >> $GITHUB_OUTPUT
+          echo "goodtimeswithscar_videos=$(jq .stats.videosPerChannel.goodtimeswithscar manifest.json)" >> $GITHUB_OUTPUT
+          echo "goodvodswithscar_videos=$(jq .stats.videosPerChannel.goodvodswithscar manifest.json)" >> $GITHUB_OUTPUT
+          echo "startDate=$(jq -r .stats.dateRange.start manifest.json)" >> $GITHUB_OUTPUT
+          echo "endDate=$(jq -r .stats.dateRange.end manifest.json)" >> $GITHUB_OUTPUT
+
+      - name: Update README.md
+        run: |
+          sed -i \
+            -e "//,//{
+                //!{
+                    //!d
+                }
+            }" \
+            -e "//a \
+            **Total Videos:** ${{ steps.stats.outputs.videoCount }}\n\
+            **Unique Terms:** ${{ steps.stats.outputs.uniqueTermCount }}\n\
+            **Main Channel Videos:** ${{ steps.stats.outputs.goodtimeswithscar_videos }}\n\
+            **VOD Channel Videos:** ${{ steps.stats.outputs.goodvodswithscar_videos }}\n\
+            **Date Range:** ${{ steps.stats.outputs.startDate }} to ${{ steps.stats.outputs.endDate }}" \
+            README.md
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README.md
+          git commit -m "docs: update stats"
+          git push
